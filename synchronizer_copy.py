@@ -4,6 +4,12 @@ import csv
 from datetime import date
 from distutils.dir_util import copy_tree
 
+# TODO copy folders as well
+# change the path for different OS systems
+# make the code run periodically
+# use os.walk
+# change the test
+
 
 def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
 
@@ -15,7 +21,6 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
     source_contents = []
     replica_contents = []
 
-    # Iterate over the content, compare, delete or create
     for root, dirs, files in os.walk(path_to_source):
         for file in files:
             full_file_path = f"{root}/{file}"
@@ -52,10 +57,8 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                     [date.today(), author, "creation", relative_file_path]
                 )
 
-    # Headers for the csv report
     headers = ["Date", "Author", "Action", "File name"]
 
-    # Check if there is a report with the same name and generate an index if so
     files_in_directory = os.listdir(".")
     index = ""
     if files_in_directory.count("report.csv") > 0:
@@ -64,7 +67,6 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
         while f"report{index}.csv" in files_in_directory:
             index = index + 1
 
-    # Write the report
     with open(f"report{index}.csv", "w", newline="") as report:
         writer = csv.writer(report)
         writer.writerow(headers)
@@ -72,7 +74,6 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
             writer.writerow(row)
 
 
-# It gives you to input the data only if the function is ran within this file
 if __name__ == "__main__":
     path_to_source = input("Path to the source folder: ")
     path_to_replica = input("Path to the replica folder: ")
