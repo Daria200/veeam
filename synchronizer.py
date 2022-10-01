@@ -1,16 +1,10 @@
 import os
-from re import X
 import shutil
 import csv
 from datetime import date
 
 
-path_to_source = input("Path to the source folder: ")
-path_to_replica = input("Path to the replica folder: ")
-author = input("Your name: ")
-
-
-def check_files_and_create_report(path_to_source, path_to_replica, author):
+def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
     files_in_source = os.listdir(path_to_source)
     files_in_replica = os.listdir(path_to_replica)
 
@@ -37,7 +31,7 @@ def check_files_and_create_report(path_to_source, path_to_replica, author):
     index = ""
     if files_in_directory.count("report.csv") > 0:
         index = files_in_directory.count("report.csv")
-    if f"reports/report{index}.csv" in files_in_directory:
+    if f"report{index}.csv" in files_in_directory:
         while f"report{index}.csv" in files_in_directory:
             index + 1
 
@@ -48,4 +42,9 @@ def check_files_and_create_report(path_to_source, path_to_replica, author):
             writer.writerow(row)
 
 
-check_files_and_create_report(path_to_source, path_to_replica, author)
+if __name__ == "__main__":
+    path_to_source = input("Path to the source folder: ")
+    path_to_replica = input("Path to the replica folder: ")
+    author = input("Your name: ")
+
+    delete_or_create_and_create_report(path_to_source, path_to_replica, author)
