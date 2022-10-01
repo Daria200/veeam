@@ -33,7 +33,7 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
         index = files_in_directory.count("report.csv")
     if f"report{index}.csv" in files_in_directory:
         while f"report{index}.csv" in files_in_directory:
-            index + 1
+            index = index + 1
 
     with open(f"report{index}.csv", "w", newline="") as report:
         writer = csv.writer(report)
