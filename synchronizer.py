@@ -14,6 +14,8 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
     # Store content of the source and replica folders
     source_contents = []
     replica_contents = []
+    source_dirs = []
+    replica_dirs = []
 
     # Iterate over the content, compare, delete or create
     for root, dirs, files in os.walk(path_to_source):
@@ -21,6 +23,10 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
             full_file_path = f"{root}/{file}"
             relative_file_path = full_file_path.replace(f"{path_to_source}/", "")
             source_contents.append(relative_file_path)
+        for dir in dirs:
+            full_file_path = f"{root}/{dir}"
+            relative_file_path = full_file_path.replace(f"{path_to_source}/", "")
+            source_dirs.append(relative_file_path)
 
     for root, dirs, files in os.walk(path_to_replica):
         for file in files:
@@ -32,8 +38,20 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                 os.remove(full_file_path)
                 print(f"File {full_file_path} was deleted in the replica folder")
                 changed_files.append(
-                    [date.today(), author, "deletion", relative_file_path]
+                    [date.today(), author, "deletion", relative_file_path, "File"]
                 )
+        for dir in dirs:
+            full_dir_path = f"{root}/{dir}"
+            relative_dir_path = full_dir_path.replace(f"{path_to_replica}/", "")
+            replica_contents.append(relative_dir_path)
+            if relative_dir_path not in source_dirs:
+                os.rmdir(full_dir_path)
+                print(f"Folder {full_dir_path} was deleted in the replica folder")
+                changed_files.append(
+                    [date.today(), author, "deletion", full_dir_path, "Folder"]
+                )
+            else:
+                replica_dirs.append(relative_dir_path)
 
     for root, dirs, files in os.walk(path_to_source):
         for file in files:
@@ -49,15 +67,22 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                 )
                 print(f"File {file} was copied to the replica folder")
                 changed_files.append(
-                    [date.today(), author, "creation", relative_file_path]
+                    [date.today(), author, "creation", relative_file_path, "File"]
                 )
         for dir in dirs:
-            source_dir_path = f"{root}/{dir}"
-            dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
-            os.makedirs(dir_to_make, exist_ok=True)
+            full_dir_path = f"{root}/{dir}"
+            relative_dir_path = full_dir_path.replace(f"{path_to_source}/", "")
+            if relative_dir_path not in replica_dirs:
+                source_dir_path = f"{root}/{dir}"
+                dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
+                os.makedirs(dir_to_make, exist_ok=True)
+                print(f"Folder {dir} was copied to the replica folder")
+                changed_files.append(
+                    [date.today(), author, "creation", relative_dir_path, "Folder"]
+                )
 
     # Headers for the csv report
-    headers = ["Date", "Author", "Action", "File name"]
+    headers = ["Date", "Author", "Action", "File name", "Type"]
 
     # Check if there is a report with the same name and generate an index if so
     files_in_directory = os.listdir(".")
