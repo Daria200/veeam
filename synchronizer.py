@@ -51,6 +51,10 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                 changed_files.append(
                     [date.today(), author, "creation", relative_file_path]
                 )
+        for dir in dirs:
+            source_dir_path = f"{root}/{dir}"
+            dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
+            os.makedirs(dir_to_make, exist_ok=True)
 
     # Headers for the csv report
     headers = ["Date", "Author", "Action", "File name"]
