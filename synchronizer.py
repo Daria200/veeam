@@ -2,7 +2,15 @@ import os
 import shutil
 import csv
 from datetime import date
-from distutils.dir_util import copy_tree
+import hashlib
+
+
+def check_content(filename):
+    hash_md5 = hashlib.md5()
+    with open(filename, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
@@ -69,6 +77,30 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                 changed_files.append(
                     [date.today(), author, "creation", relative_file_path, "File"]
                 )
+            else:
+                # Check the file content. Copy if different
+                if not check_content(
+                    f"{path_to_replica}/{relative_file_path}"
+                ) == check_content(f"{path_to_source}/{relative_file_path}"):
+                    file_to_copy = f"{path_to_source}/{relative_file_path}"
+                    copy_destination = f"{path_to_replica}/{relative_file_path}"
+                    shutil.copyfile(
+                        file_to_copy,
+                        copy_destination,
+                    )
+                    print(
+                        f"File {file} was copied to the replica folder, because the content was different"
+                    )
+                    changed_files.append(
+                        [
+                            date.today(),
+                            author,
+                            "copied because the content was different",
+                            relative_file_path,
+                            "File",
+                        ]
+                    )
+
         for dir in dirs:
             full_dir_path = f"{root}/{dir}"
             relative_dir_path = full_dir_path.replace(f"{path_to_source}/", "")

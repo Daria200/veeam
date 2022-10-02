@@ -2,7 +2,7 @@ import os
 import shutil
 
 
-from synchronizer import delete_or_create_and_create_report
+from synchronizer import delete_or_create_and_create_report, check_content
 
 
 def test_delete_or_create_and_create_report():
@@ -46,6 +46,8 @@ def test_delete_or_create_and_create_report():
     # Create file to copy
     with open(f"{path_to_source}/file_to_copy.py", "w") as file:
         file.write("Text")
+    with open(f"{path_to_source}/overwrite.txt", "w") as file:
+        file.write("This is the right text")
 
     # Create the replica folder
     directory = "replica"
@@ -61,6 +63,8 @@ def test_delete_or_create_and_create_report():
     # Create file in the replica folder that exist in the source folder as well
     with open(f"{path_to_replica}/style.css", "w") as file:
         file.write("Text")
+    with open(f"{path_to_replica}/overwrite.txt", "w") as file:
+        file.write("This the wrong text")
 
     # Create files and folders to delete
     with open(f"{path_to_replica}/file_to_delete.py", "w") as file:
@@ -89,6 +93,10 @@ def test_delete_or_create_and_create_report():
     assert "file_to_delete.py" not in files_in_replica
     assert "empty_folder_to_delete" not in files_in_replica
     assert "folder_to_delete" not in files_in_replica
+
+    assert check_content(f"{path_to_source}/overwrite.txt") == check_content(
+        f"{path_to_replica}/overwrite.txt"
+    )
 
     # Check the content of the source folder
     assert "folder_with_content" in files_in_source
