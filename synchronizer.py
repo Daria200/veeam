@@ -45,7 +45,7 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
             relative_dir_path = full_dir_path.replace(f"{path_to_replica}/", "")
             replica_contents.append(relative_dir_path)
             if relative_dir_path not in source_dirs:
-                os.rmdir(full_dir_path)
+                shutil.rmtree(full_dir_path)
                 print(f"Folder {full_dir_path} was deleted in the replica folder")
                 changed_files.append(
                     [date.today(), author, "deletion", full_dir_path, "Folder"]
