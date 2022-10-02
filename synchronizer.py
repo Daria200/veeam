@@ -1,8 +1,11 @@
+import csv
+import hashlib
 import os
 import shutil
-import csv
+
 from datetime import date
-import hashlib
+
+SEP = os.sep
 
 
 def check_content(filename):
@@ -28,18 +31,18 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
     # Iterate over the content, compare, delete or create
     for root, dirs, files in os.walk(path_to_source):
         for file in files:
-            full_file_path = f"{root}/{file}"
-            relative_file_path = full_file_path.replace(f"{path_to_source}/", "")
+            full_file_path = f"{root}{SEP}{file}"
+            relative_file_path = full_file_path.replace(f"{path_to_source}{SEP}", "")
             source_contents.append(relative_file_path)
         for dir in dirs:
-            full_file_path = f"{root}/{dir}"
-            relative_file_path = full_file_path.replace(f"{path_to_source}/", "")
+            full_file_path = f"{root}{SEP}{dir}"
+            relative_file_path = full_file_path.replace(f"{path_to_source}{SEP}", "")
             source_dirs.append(relative_file_path)
 
     for root, dirs, files in os.walk(path_to_replica):
         for file in files:
-            full_file_path = f"{root}/{file}"
-            relative_file_path = full_file_path.replace(f"{path_to_replica}/", "")
+            full_file_path = f"{root}{SEP}{file}"
+            relative_file_path = full_file_path.replace(f"{path_to_replica}{SEP}", "")
             replica_contents.append(relative_file_path)
 
             if relative_file_path not in source_contents:
@@ -49,8 +52,8 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                     [date.today(), author, "deletion", relative_file_path, "File"]
                 )
         for dir in dirs:
-            full_dir_path = f"{root}/{dir}"
-            relative_dir_path = full_dir_path.replace(f"{path_to_replica}/", "")
+            full_dir_path = f"{root}{SEP}{dir}"
+            relative_dir_path = full_dir_path.replace(f"{path_to_replica}{SEP}", "")
             replica_contents.append(relative_dir_path)
             if relative_dir_path not in source_dirs:
                 shutil.rmtree(full_dir_path)
@@ -63,11 +66,11 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
 
     for root, dirs, files in os.walk(path_to_source):
         for file in files:
-            full_file_path = f"{root}/{file}"
-            relative_file_path = full_file_path.replace(f"{path_to_source}/", "")
+            full_file_path = f"{root}{SEP}{file}"
+            relative_file_path = full_file_path.replace(f"{path_to_source}{SEP}", "")
             if relative_file_path not in replica_contents:
-                file_to_copy = f"{path_to_source}/{relative_file_path}"
-                copy_destination = f"{path_to_replica}/{relative_file_path}"
+                file_to_copy = f"{path_to_source}{SEP}{relative_file_path}"
+                copy_destination = f"{path_to_replica}{SEP}{relative_file_path}"
                 os.makedirs(os.path.dirname(copy_destination), exist_ok=True)
                 shutil.copyfile(
                     file_to_copy,
@@ -80,10 +83,10 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
             else:
                 # Check the file content. Copy if different
                 if not check_content(
-                    f"{path_to_replica}/{relative_file_path}"
-                ) == check_content(f"{path_to_source}/{relative_file_path}"):
-                    file_to_copy = f"{path_to_source}/{relative_file_path}"
-                    copy_destination = f"{path_to_replica}/{relative_file_path}"
+                    f"{path_to_replica}{SEP}{relative_file_path}"
+                ) == check_content(f"{path_to_source}{SEP}{relative_file_path}"):
+                    file_to_copy = f"{path_to_source}{SEP}{relative_file_path}"
+                    copy_destination = f"{path_to_replica}{SEP}{relative_file_path}"
                     shutil.copyfile(
                         file_to_copy,
                         copy_destination,
@@ -102,10 +105,10 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                     )
 
         for dir in dirs:
-            full_dir_path = f"{root}/{dir}"
-            relative_dir_path = full_dir_path.replace(f"{path_to_source}/", "")
+            full_dir_path = f"{root}{SEP}{dir}"
+            relative_dir_path = full_dir_path.replace(f"{path_to_source}{SEP}", "")
             if relative_dir_path not in replica_dirs:
-                source_dir_path = f"{root}/{dir}"
+                source_dir_path = f"{root}{SEP}{dir}"
                 dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
                 os.makedirs(dir_to_make, exist_ok=True)
                 print(f"Folder {dir} was copied to the replica folder")
