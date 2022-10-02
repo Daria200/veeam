@@ -70,13 +70,23 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                 replica_dirs.append(relative_dir_path)
 
     for root, dirs, files in os.walk(path_to_source):
+        for dir in dirs:
+            full_dir_path = f"{root}{SEP}{dir}"
+            relative_dir_path = clean_the_path(full_dir_path, path_to_source)
+            if relative_dir_path not in replica_dirs:
+                source_dir_path = f"{root}{SEP}{dir}"
+                dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
+                os.makedirs(dir_to_make, exist_ok=True)
+                print(f"Folder {dir} was copied to the replica folder")
+                changed_files.append(
+                    [date.today(), author, "creation", relative_dir_path, "Folder"]
+                )
         for file in files:
             full_file_path = f"{root}{SEP}{file}"
             relative_file_path = clean_the_path(full_file_path, path_to_source)
             if relative_file_path not in replica_contents:
                 file_to_copy = f"{path_to_source}{SEP}{relative_file_path}"
                 copy_destination = f"{path_to_replica}{SEP}{relative_file_path}"
-                os.makedirs(os.path.dirname(copy_destination), exist_ok=True)
                 shutil.copyfile(
                     file_to_copy,
                     copy_destination,
@@ -109,18 +119,6 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                         ]
                     )
 
-        for dir in dirs:
-            full_dir_path = f"{root}{SEP}{dir}"
-            relative_dir_path = clean_the_path(full_dir_path, path_to_source)
-            if relative_dir_path not in replica_dirs:
-                source_dir_path = f"{root}{SEP}{dir}"
-                dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
-                os.makedirs(dir_to_make, exist_ok=True)
-                print(f"Folder {dir} was copied to the replica folder")
-                changed_files.append(
-                    [date.today(), author, "creation", relative_dir_path, "Folder"]
-                )
-
     # Headers for the csv report
     headers = ["Date", "Author", "Action", "File name", "Type"]
 
@@ -146,10 +144,10 @@ if __name__ == "__main__":
     path_to_source = input("Path to the source folder: ")
     path_to_replica = input("Path to the replica folder: ")
     author = input("Your name: ")
-    number_of_cycles = input("How many times do you want the program to run?")
-    interval = input("with what interval (in mimutes)?")
+    number_of_cycles = int(input("How many times do you want the program to run?"))
+    if number_of_cycles > 1:
+        interval = input("with what interval (in mimutes)?")
 
-    number_of_cycles = int(number_of_cycles)
     while number_of_cycles > 0:
         number_of_cycles = number_of_cycles - 1
         delete_or_create_and_create_report(path_to_source, path_to_replica, author)
