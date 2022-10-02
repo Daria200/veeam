@@ -29,21 +29,25 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
     source_dirs = []
     replica_dirs = []
 
+    def clean_the_path(full_path, path_to_folder):
+        relative_path = full_path.replace(f"{path_to_folder}{SEP}", "")
+        return relative_path
+
     # Iterate over the content, compare, delete or create
     for root, dirs, files in os.walk(path_to_source):
         for file in files:
             full_file_path = f"{root}{SEP}{file}"
-            relative_file_path = full_file_path.replace(f"{path_to_source}{SEP}", "")
+            relative_file_path = clean_the_path(full_file_path, path_to_source)
             source_contents.append(relative_file_path)
         for dir in dirs:
             full_file_path = f"{root}{SEP}{dir}"
-            relative_file_path = full_file_path.replace(f"{path_to_source}{SEP}", "")
+            relative_file_path = clean_the_path(full_file_path, path_to_source)
             source_dirs.append(relative_file_path)
 
     for root, dirs, files in os.walk(path_to_replica):
         for file in files:
             full_file_path = f"{root}{SEP}{file}"
-            relative_file_path = full_file_path.replace(f"{path_to_replica}{SEP}", "")
+            relative_file_path = clean_the_path(full_file_path, path_to_replica)
             replica_contents.append(relative_file_path)
 
             if relative_file_path not in source_contents:
@@ -54,7 +58,7 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
                 )
         for dir in dirs:
             full_dir_path = f"{root}{SEP}{dir}"
-            relative_dir_path = full_dir_path.replace(f"{path_to_replica}{SEP}", "")
+            relative_dir_path = clean_the_path(full_dir_path, path_to_replica)
             replica_contents.append(relative_dir_path)
             if relative_dir_path not in source_dirs:
                 shutil.rmtree(full_dir_path)
@@ -68,7 +72,7 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
     for root, dirs, files in os.walk(path_to_source):
         for file in files:
             full_file_path = f"{root}{SEP}{file}"
-            relative_file_path = full_file_path.replace(f"{path_to_source}{SEP}", "")
+            relative_file_path = clean_the_path(full_file_path, path_to_source)
             if relative_file_path not in replica_contents:
                 file_to_copy = f"{path_to_source}{SEP}{relative_file_path}"
                 copy_destination = f"{path_to_replica}{SEP}{relative_file_path}"
@@ -107,7 +111,7 @@ def delete_or_create_and_create_report(path_to_source, path_to_replica, author):
 
         for dir in dirs:
             full_dir_path = f"{root}{SEP}{dir}"
-            relative_dir_path = full_dir_path.replace(f"{path_to_source}{SEP}", "")
+            relative_dir_path = clean_the_path(full_dir_path, path_to_source)
             if relative_dir_path not in replica_dirs:
                 source_dir_path = f"{root}{SEP}{dir}"
                 dir_to_make = source_dir_path.replace(path_to_source, path_to_replica)
