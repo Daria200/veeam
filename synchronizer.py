@@ -4,6 +4,7 @@ import os
 import shutil
 
 from datetime import date
+from time import sleep
 
 SEP = os.sep
 
@@ -141,5 +142,15 @@ if __name__ == "__main__":
     path_to_source = input("Path to the source folder: ")
     path_to_replica = input("Path to the replica folder: ")
     author = input("Your name: ")
+    number_of_cycles = input("How many times do you want the program to run?")
+    interval = input("with what interval (in mimutes)?")
 
-    delete_or_create_and_create_report(path_to_source, path_to_replica, author)
+    number_of_cycles = int(number_of_cycles)
+    while number_of_cycles > 0:
+        number_of_cycles = number_of_cycles - 1
+        delete_or_create_and_create_report(path_to_source, path_to_replica, author)
+        if number_of_cycles > 0:
+            print("The program will run ", number_of_cycles, " more time(s)")
+            sleep(int(interval) * 60)
+        else:
+            print("The program finished")
